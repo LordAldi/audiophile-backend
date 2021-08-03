@@ -9,7 +9,7 @@ describe('Product model', () => {
         name: faker.name.findName(),
         description: faker.lorem.paragraph(),
         category: 'headphones',
-        price: faker.random.number({ min: 1, max: 1000 }),
+        price: faker.datatype.number({ min: 1, max: 1000 }),
         features: faker.lorem.paragraphs(2),
         isShow: false,
         inTheBox: [
@@ -21,6 +21,14 @@ describe('Product model', () => {
     });
 
     test('should correctly validate a valid product', async () => {
+      await expect(new ProductModel(newProduct).validate()).resolves.toBeUndefined();
+    });
+    test('should correctly validate a valid product speakers', async () => {
+      newProduct.category = 'speakers';
+      await expect(new ProductModel(newProduct).validate()).resolves.toBeUndefined();
+    });
+    test('should correctly validate a valid product earphones', async () => {
+      newProduct.category = 'earphones';
       await expect(new ProductModel(newProduct).validate()).resolves.toBeUndefined();
     });
 

@@ -8,12 +8,26 @@ export type MongooseObjectIdType = {
   _id?: Types.ObjectId;
 };
 
-export const productOne: Readonly<IProduct & MongooseObjectIdType> = {
+export const productHeadphones: Readonly<IProduct & MongooseObjectIdType> = {
   _id: Types.ObjectId(),
   name: faker.name.findName(),
   description: faker.lorem.paragraph(),
   category: 'headphones',
-  price: faker.random.number({ min: 1, max: 1000 }),
+  price: 599,
+  features: faker.lorem.paragraphs(2),
+  isShow: false,
+  inTheBox: [
+    { name: 'headphone unit', total: 1 },
+    { name: 'user manual', total: 1 },
+    { name: 'replacement earcup', total: 2 },
+  ],
+};
+export const productHeadphones2: Readonly<IProduct & MongooseObjectIdType> = {
+  _id: Types.ObjectId(),
+  name: faker.name.findName(),
+  description: faker.lorem.paragraph(),
+  category: 'headphones',
+  price: 299,
   features: faker.lorem.paragraphs(2),
   isShow: false,
   inTheBox: [
@@ -23,12 +37,26 @@ export const productOne: Readonly<IProduct & MongooseObjectIdType> = {
   ],
 };
 
-export const productTwo: Readonly<IProduct & MongooseObjectIdType> = {
+export const productEarphones: Readonly<IProduct & MongooseObjectIdType> = {
   _id: Types.ObjectId(),
   name: faker.name.findName(),
   description: faker.lorem.paragraph(),
   category: 'earphones',
-  price: faker.random.number({ min: 1, max: 1000 }),
+  price: 350,
+  features: faker.lorem.paragraphs(2),
+  isShow: false,
+  inTheBox: [
+    { name: 'headphone unit', total: 1 },
+    { name: 'user manual', total: 1 },
+    { name: 'replacement earcup', total: 2 },
+  ],
+};
+export const productSpeakers: Readonly<IProduct & MongooseObjectIdType> = {
+  _id: Types.ObjectId(),
+  name: faker.name.findName(),
+  description: faker.lorem.paragraph(),
+  category: 'speakers',
+  price: 799,
   features: faker.lorem.paragraphs(2),
   isShow: false,
   inTheBox: [
