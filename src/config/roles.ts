@@ -2,7 +2,7 @@ export type RoleNames = 'admin' | 'user';
 
 const allRoles: { [key: string]: readonly string[] } = Object.freeze({
   user: Object.freeze([]),
-  admin: Object.freeze(['getUsers', 'manageUsers']),
+  admin: Object.freeze(['getUsers', 'manageUsers', 'manageProducts']),
 });
 
 export const roles = Object.freeze(Object.keys(allRoles));

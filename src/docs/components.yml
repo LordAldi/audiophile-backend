@@ -19,6 +19,46 @@ components:
         name: fake name
         role: user
 
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          description: At least more than 0
+        category:
+           type: string
+           enum: [earphones, headphones, speakers]
+        features:
+           type: string
+        inTheBox:
+           type: array
+           items:
+              type: object
+              properties:
+                 name:
+                    type:string
+                 total:
+                    type:integer
+        isShow:
+           type: boolean
+      example:
+        name: fake product
+        description: this is the best product
+        price: 1200
+        category: earphones
+        features: with noise cancellation
+        isShow: false
+        inTheBox:
+          - name: component a
+            total: 2
+          - name: component B
+            total: 1
     Token:
       type: object
       properties:
@@ -46,6 +86,7 @@ components:
           type: number
         message:
           type: string
+
 
   responses:
     DuplicateEmail:

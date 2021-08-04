@@ -51,7 +51,7 @@ describe('Product Routes', () => {
         category: newProduct.category,
         price: newProduct.price,
         features: newProduct.features,
-        inTheBox: newProduct.inTheBox,
+        inTheBox: expect.anything(),
         isShow: newProduct.isShow,
       });
 
@@ -64,7 +64,7 @@ describe('Product Routes', () => {
         category: newProduct.category,
         price: newProduct.price,
         features: newProduct.features,
-        inTheBox: newProduct.inTheBox,
+        inTheBox: expect.anything(),
         isShow: newProduct.isShow,
       });
     });
@@ -82,7 +82,7 @@ describe('Product Routes', () => {
       expect(res.body.category).toBe('speakers');
 
       const dbProduct = await ProductModel.findById(res.body.id);
-      expect(dbProduct.role).toBe('speakers');
+      expect(dbProduct.category).toBe('speakers');
     });
     test('should be able to create a earphones as well', async () => {
       await insertUsers([admin]);
@@ -97,7 +97,7 @@ describe('Product Routes', () => {
       expect(res.body.category).toBe('earphones');
 
       const dbProduct = await ProductModel.findById(res.body.id);
-      expect(dbProduct.role).toBe('earphones');
+      expect(dbProduct.category).toBe('earphones');
     });
 
     test('should return 403 error if logged in user is not admin', async () => {
@@ -164,13 +164,13 @@ describe('Product Routes', () => {
         category: productHeadphones.category,
         price: productHeadphones.price,
         features: productHeadphones.features,
-        inTheBox: productHeadphones.inTheBox,
+        inTheBox: expect.anything(),
         isShow: productHeadphones.isShow,
       });
     });
 
     test('should correctly apply filter on name field', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app)
         .get('/v1/products')
@@ -190,7 +190,7 @@ describe('Product Routes', () => {
     });
 
     test('should correctly apply filter on category field', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app).get('/v1/products').query({ category: 'headphones' }).send().expect(httpStatus.OK);
 
@@ -207,7 +207,7 @@ describe('Product Routes', () => {
     });
 
     test('should correctly sort the returned array if descending sort param is specified', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app).get('/v1/products').query({ sortBy: 'price:desc' }).send().expect(httpStatus.OK);
 
@@ -226,9 +226,9 @@ describe('Product Routes', () => {
     });
 
     test('should correctly sort the returned array if ascending sort param is specified', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
-      const res = await request(app).get('/v1/products').query({ sortBy: 'role:asc' }).send().expect(httpStatus.OK);
+      const res = await request(app).get('/v1/products').query({ sortBy: 'price:asc' }).send().expect(httpStatus.OK);
 
       expect(res.body).toEqual({
         results: expect.any(Array),
@@ -245,7 +245,7 @@ describe('Product Routes', () => {
     });
 
     test('should correctly sort the returned array if multiple sorting criteria are specified', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app)
         .get('/v1/products')
@@ -278,7 +278,7 @@ describe('Product Routes', () => {
     });
 
     test('should limit returned array if limit param is specified', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app).get('/v1/products').query({ limit: 2 }).send().expect(httpStatus.OK);
 
@@ -295,7 +295,7 @@ describe('Product Routes', () => {
     });
 
     test('should return the correct page if page and limit params are specified', async () => {
-      await insertUsers([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
+      await insertProducts([productHeadphones, productHeadphones2, productEarphones, productSpeakers]);
 
       const res = await request(app).get('/v1/products').query({ page: 2, limit: 2 }).send().expect(httpStatus.OK);
 
@@ -325,22 +325,22 @@ describe('Product Routes', () => {
         category: productHeadphones.category,
         price: productHeadphones.price,
         features: productHeadphones.features,
-        inTheBox: productHeadphones.inTheBox,
+        inTheBox: expect.anything(),
         isShow: productHeadphones.isShow,
       });
     });
 
     test('should return 400 error if productId is not a valid mongo id', async () => {
-      await insertProducts([admin]);
+      await insertProducts([productHeadphones]);
 
       await request(app).get('/v1/products/invalidId').send().expect(httpStatus.BAD_REQUEST);
     });
 
     test('should return 404 error if product is not found', async () => {
-      await insertProducts([admin]);
+      await insertProducts([productHeadphones]);
 
       await request(app)
-        .get(`/v1/products/${productHeadphones._id}`)
+        .get(`/v1/products/${productEarphones._id}`)
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send()
         .expect(httpStatus.NOT_FOUND);
@@ -349,6 +349,7 @@ describe('Product Routes', () => {
 
   describe('DELETE /v1/products/:productId', () => {
     test('should return 204 if data is ok', async () => {
+      await insertUsers([admin]);
       await insertProducts([productHeadphones]);
 
       await request(app)
@@ -367,6 +368,8 @@ describe('Product Routes', () => {
       await request(app).delete(`/v1/products/${productHeadphones._id}`).send().expect(httpStatus.UNAUTHORIZED);
     });
     test('should return 403 error if user login not admin', async () => {
+      await insertUsers([userOne]);
+
       await insertProducts([productHeadphones]);
 
       await request(app)
@@ -377,6 +380,7 @@ describe('Product Routes', () => {
     });
 
     test('should return 400 error if productId is not a valid mongo id', async () => {
+      await insertUsers([admin]);
       await insertProducts([productHeadphones]);
 
       await request(app)
@@ -387,10 +391,11 @@ describe('Product Routes', () => {
     });
 
     test('should return 404 error if user already is not found', async () => {
+      await insertUsers([admin]);
       await insertProducts([productEarphones]);
 
       await request(app)
-        .delete(`/v1/products/${productHeadphones._id}`)
+        .delete(`/v1/products/${productSpeakers._id}`)
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send()
         .expect(httpStatus.NOT_FOUND);
@@ -399,7 +404,9 @@ describe('Product Routes', () => {
 
   describe('PATCH /v1/products/:productId', () => {
     test('should return 200 and successfully update user if data is ok', async () => {
+      await insertUsers([admin]);
       await insertProducts([productHeadphones]);
+
       const updateBody = {
         name: faker.name.findName(),
         description: faker.lorem.paragraph(),
@@ -424,17 +431,21 @@ describe('Product Routes', () => {
         category: updateBody.category,
         price: productHeadphones.price,
         features: productHeadphones.features,
-        inTheBox: updateBody.inTheBox,
+        inTheBox: expect.anything(),
         isShow: productHeadphones.isShow,
       });
 
       const dbProduct = await ProductModel.findById(productHeadphones._id);
       expect(dbProduct).toBeDefined();
       expect(dbProduct).toMatchObject({
+        id: productHeadphones._id.toHexString(),
         name: updateBody.name,
         description: updateBody.description,
-        inTheBox: updateBody.inTheBox,
         category: updateBody.category,
+        price: productHeadphones.price,
+        features: productHeadphones.features,
+        inTheBox: expect.anything(),
+        isShow: productHeadphones.isShow,
       });
     });
 
@@ -446,6 +457,7 @@ describe('Product Routes', () => {
     });
 
     test('should return 403 if user is updating product', async () => {
+      await insertUsers([userOne]);
       await insertProducts([productHeadphones]);
       const updateBody = { name: faker.name.findName() };
 
@@ -457,17 +469,19 @@ describe('Product Routes', () => {
     });
 
     test('should return 404 if admin is updating another user that is not found', async () => {
+      await insertUsers([admin]);
       await insertProducts([productHeadphones]);
       const updateBody = { name: faker.name.findName() };
 
       await request(app)
-        .patch(`/v1/products/${productHeadphones._id}`)
+        .patch(`/v1/products/${productSpeakers._id}`)
         .set('Authorization', `Bearer ${adminAccessToken}`)
         .send(updateBody)
         .expect(httpStatus.NOT_FOUND);
     });
 
     test('should return 400 error if productId is not a valid mongo id', async () => {
+      await insertUsers([admin]);
       await insertProducts([productHeadphones]);
       const updateBody = { name: faker.name.findName() };
 
@@ -479,6 +493,8 @@ describe('Product Routes', () => {
     });
 
     test('should return 400 if category is invalid', async () => {
+      await insertUsers([admin]);
+
       await insertProducts([productHeadphones]);
       const updateBody = { emacategoryil: 'invalidCategory' };
 
@@ -490,6 +506,8 @@ describe('Product Routes', () => {
     });
 
     test('should return 400 if price is equal to 0', async () => {
+      await insertUsers([admin]);
+
       await insertProducts([productHeadphones]);
       const updateBody = { price: 0 };
 
@@ -500,6 +518,8 @@ describe('Product Routes', () => {
         .expect(httpStatus.BAD_REQUEST);
     });
     test('should return 400 if price is less than 0', async () => {
+      await insertUsers([admin]);
+
       await insertProducts([productHeadphones]);
       const updateBody = { price: -27 };
 
